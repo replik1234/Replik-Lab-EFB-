@@ -5,10 +5,10 @@ import pandas as pd
 import time
 
 # ==============================================================================
-# CONFIGURATION DE LA PAGE & CHARTE GRAPHIQUE REPLIK (SLIDES LAB EFB)
+# CONFIGURATION DE LA PAGE & IDENTITÉ VISUELLE DU CABINET REPLIK
 # ==============================================================================
 st.set_page_config(
-    page_title="CABINET REPLIK | Plus vite que la viralité",
+    page_title="Cabinet Replik | Protection & Défense Réputationnelle",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -16,38 +16,53 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* Couleurs officielles du deck Replik : Marine #0f1226, Rose #e61e6e, Violet #7c3aed */
-    .replik-banner {
-        background: linear-gradient(135deg, #0f1226 0%, #1e1b4b 60%, #e61e6e 100%);
-        padding: 24px;
-        border-radius: 14px;
+    .replik-header {
+        background: linear-gradient(135deg, #0f1226 0%, #1e1b4b 65%, #e61e6e 100%);
+        padding: 22px 28px;
+        border-radius: 12px;
         color: white;
         margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     }
-    .step-badge {
-        background-color: #7c3aed;
-        color: white;
-        padding: 4px 10px;
+    .badge-role {
+        background-color: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+        padding: 4px 12px;
         border-radius: 20px;
         font-size: 0.8em;
-        font-weight: bold;
+        font-weight: 600;
+        letter-spacing: 0.5px;
     }
-    .hash-cert {
+    .cert-box {
         font-family: 'Courier New', monospace;
         background-color: #0f1226;
         color: #10b981;
-        padding: 16px;
+        padding: 18px;
         border-radius: 10px;
         border-left: 5px solid #e61e6e;
         font-size: 0.88em;
-        line-height: 1.5;
+        line-height: 1.6;
     }
-    .kpi-box {
+    .step-card-done {
+        background-color: #ecfdf5;
+        border: 1px solid #10b981;
+        border-top: 4px solid #10b981;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .step-card-wait {
         background-color: #f8fafc;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #cbd5e1;
+        border-top: 4px solid #94a3b8;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .step-card-active {
+        background-color: #fdf2f8;
+        border: 1px solid #e61e6e;
         border-top: 4px solid #e61e6e;
-        padding: 14px;
+        padding: 12px;
         border-radius: 8px;
         text-align: center;
     }
@@ -55,613 +70,567 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# BASE DE DONNÉES DES 10 FAUX SIGNALEMENTS (SLIDE 18 - BANC DE TEST BÊTA)
+# DOSSIERS TYPES PRÉ-CONFIGURÉS (POUR FLUIDIFIER LA DÉMONSTRATION)
 # ==============================================================================
-DIX_SIGNALEMENTS = [
+DOSSIERS_TYPES = [
     {
-        "id": "SIG-01",
-        "titre": "1. Deepfake pornographique (Affaire type CFake)",
-        "client": "Clara M. (Étudiante, 22 ans)",
-        "profil": "P1 Particulier (ou Réaction directe)",
-        "plateforme": "Telegram & Site tube hébergé en UE",
-        "url": "https://t.me/leak_fr_chan/98234",
-        "jours_depuis_pub": 3,
-        "auteur_identifie": False,
-        "nuit_weekend": True,
-        "description": "Montage photo/vidéo hypertruqué (deepfake sexuel) utilisant le visage de la cliente sans son consentement, accompagné de son vrai prénom et de son université.",
-        "ia_qualification": "Montage à caractère sexuel sans consentement / Deepfake (Art. 226-8-1 du Code pénal : 2 ans d'emprisonnement et 60 000 € d'amende, porté à 3 ans et 75 000 € en ligne).",
-        "ia_traite_auto": "Extraction métadonnées, empreinte SHA-256 locale, pré-remplissage du signalement prioritaire DSA (Art. 16) + Pharos, activation veille 7 jours anti-republication.",
-        "renvoi_avocat": "Validation d'urgence par l'avocat de permanence (<15 min) : choix du constat R3 (Commissaire 24/7) et dépôt de plainte pénale au procureur (J2B) avec demande de réquisition IP.",
-        "recommandation_r": "R3 Preuve authentique (320 € HT) + Majoration Nuit/WE (+150 € HT)",
-        "recommandation_j": "J2B Plainte au procureur (700 à 1 000 € HT - Constat R3 inclus)"
+        "id": "RPK-2026-01",
+        "label": "Cas 1 — Montage Deepfake à caractère sexuel (Particulier)",
+        "client": "Clara M.",
+        "profil": "Particulier (Sans abonnement)",
+        "formule": "R3 Preuve authentique (320 € HT) — Constat Commissaire 24h/24 inclus",
+        "plateforme": "Telegram & Site web tiers",
+        "url": "https://t.me/channel_archive_fr/98234",
+        "jours_pub": 3,
+        "auteur_connu": False,
+        "urgence_nuit": True,
+        "faits": "Diffusion sans consentement d'un montage photo/vidéo hypertruqué (deepfake) utilisant le visage de la cliente, associé à son identité réelle et au nom de son établissement.",
+        "ia_qualification": "Montage à caractère sexuel sans consentement (Art. 226-8-1 du Code pénal : 2 ans d'emprisonnement et 60 000 € d'amende, porté à 3 ans et 75 000 € en ligne).",
+        "ia_actions": "Empreinte probatoire SHA-256 en local, pré-remplissage du signalement prioritaire DSA (Art. 16) et PHAROS, lancement de la veille anti-republication sur 7 jours.",
+        "avocat_arbitrage": "Validation du constat par commissaire de justice d'astreinte 24h/24 (R3) et dépôt d'une plainte pénale auprès du Procureur (J2B) avec demande de réquisition IP.",
+        "suite_justice": "J2B Plainte au procureur (700 à 1 000 € HT — Constat R3 inclus)"
     },
     {
-        "id": "SIG-02",
-        "titre": "2. Raid de faux avis Google contre une clinique (Dénigrement)",
-        "client": "SAS Clinique Esthétique Lumière",
-        "profil": "P3 Entreprise — Niveau 2 Preuve (299 € HT/mois)",
-        "plateforme": "Google Maps / Fiche Établissement",
-        "url": "https://maps.google.com/reviews/clinique_lumiere_raid88",
-        "jours_depuis_pub": 14,
-        "auteur_identifie": False,
-        "nuit_weekend": False,
-        "description": "Publication coordonnée de 12 avis 1 étoile en 2 heures : 'Clinique insalubre, produits périmés, la directrice falsifie ses diplômes et escroque les patients !'",
-        "ia_qualification": "Dénigrement commercial fautif (Art. 1240 C. civ.) + Diffamation publique (Art. 29 et 32 Loi du 29 juillet 1881) + Pratique commerciale trompeuse.",
-        "ia_traite_auto": "Détection d'anomalie statistique (bot/ferme à clics), capture horodatée R2 (incluse dans P3 Niveau 2), génération du rapport d'illicéité DSA pour Google Ireland.",
-        "renvoi_avocat": "Arbitrage stratégique avocat : privilégier l'Art. 1240 C. civ. (dénigrement des produits) ou la Loi de 1881 (diffamation sur les diplômes) et rédiger la mise en demeure + référé retrait (R4 à -15%).",
-        "recommandation_r": "R4 Retrait judiciaire (1 700 € HT avec remise -15% abonné P3 Niv. 2)",
-        "recommandation_j": "J1 Justice civile (2 800 à 5 150 € HT - Dommages-intérêts)"
+        "id": "RPK-2026-02",
+        "label": "Cas 2 — Raid coordonné de faux avis Google (Entreprise)",
+        "client": "SAS Clinique Lumière (Dr. Sophie Martin)",
+        "profil": "Abonné P3 Entreprise — Niveau 2 Preuve (299 € HT/mois)",
+        "formule": "R4 Retrait judiciaire (1 700 € HT avec remise abonné -15%)",
+        "plateforme": "Google Maps (Fiche Établissement)",
+        "url": "https://maps.google.com/reviews/clinique_lumiere_id88",
+        "jours_pub": 14,
+        "auteur_connu": False,
+        "urgence_nuit": False,
+        "faits": "Publication coordonnée de 12 avis 1 étoile en deux heures : 'Clinique insalubre, utilisation de produits périmés dangereux, la directrice falsifie ses diplômes !'",
+        "ia_qualification": "Dénigrement commercial fautif (Art. 1240 du Code civil) et Diffamation publique (Art. 29 al. 1 et 32 de la Loi du 29 juillet 1881).",
+        "ia_actions": "Détection de l'anomalie temporelle (raid), capture certifiée R2 (incluse dans l'abonnement P3 Niveau 2), préparation de la mise en demeure Google Ireland.",
+        "avocat_arbitrage": "Choix stratégique du fondement : privilégier le dénigrement commercial (Art. 1240 C. civ.) sur la qualité des soins et assigner en référé sous astreinte.",
+        "suite_justice": "J1 Justice civile — Action en réparation du préjudice financier (2 800 à 5 150 € HT)"
     },
     {
-        "id": "SIG-03",
-        "titre": "3. Voix clonée par IA d'un influenceur (Arnaque financière)",
-        "client": "Lucas 'SkyVibe' (Créateur de contenu, 800k abonnés)",
-        "profil": "P2 Personnalité — Niveau 3 Justice (449 € HT/mois)",
+        "id": "RPK-2026-03",
+        "label": "Cas 3 — Voix clonée par IA et faux profil d'influenceur (Personnalité)",
+        "client": "Lucas 'SkyVibe' (Créateur de contenu)",
+        "profil": "Abonné P2 Personnalité — Niveau 3 Justice (449 € HT/mois)",
+        "formule": "Inclus dans l'abonnement P2 Niveau 3 (Constat & Retrait)",
         "plateforme": "TikTok & Instagram Reels",
-        "url": "https://tiktok.com/@skyvibe_officiel_crypto/video/778899",
-        "jours_depuis_pub": 1,
-        "auteur_identifie": False,
-        "nuit_weekend": True,
-        "description": "Vidéo sponsorisée utilisant un clone vocal IA et le visage de l'influenceur pour promouvoir une fausse plateforme d'investissement financier.",
-        "ia_qualification": "Atteinte à la représentation de la personne / Hypertrucage vocal (Art. 226-8 et 226-8-1 C. pén.) + Usurpation d'identité numérique (Art. 226-4-1 C. pén.).",
-        "ia_traite_auto": "Détection biométrique/vocale par l'IA du prestataire, figeage SHA-256 par l'IA locale, préparation du dossier de notification d'urgence Meta & TikTok.",
-        "renvoi_avocat": "Coordination immédiate avec l'équipe de communication du VIP (éviter l'effet Streisand), mobilisation d'un des 2 constats de commissaire inclus dans P2 Niv. 3 et plainte pénale.",
-        "recommandation_r": "Inclus dans l'abonnement P2 Niveau 3 (+20 € HT intervention nuit/WE)",
-        "recommandation_j": "J2B Plainte au procureur (700 à 1 000 € HT)"
+        "url": "https://tiktok.com/@skyvibe_invest_officiel/video/778899",
+        "jours_pub": 1,
+        "auteur_connu": False,
+        "urgence_nuit": True,
+        "faits": "Vidéo utilisant un clone vocal généré par IA et l'image du client pour promouvoir une escroquerie financière auprès de sa communauté.",
+        "ia_qualification": "Atteinte à la représentation de la personne par hypertrucage (Art. 226-8 et 226-8-1 C. pén.) et Usurpation d'identité numérique (Art. 226-4-1 C. pén.).",
+        "ia_actions": "Alerte remontée par l'IA de veille, figeage probatoire local, préparation des notifications d'urgence Meta et TikTok.",
+        "avocat_arbitrage": "Coordination confidentielle avec l'agent de la personnalité (prévention de l'effet Streisand), mobilisation d'un constat R3 inclus dans le forfait P2 Niveau 3.",
+        "suite_justice": "J2B Plainte au procureur (700 à 1 000 € HT)"
     },
     {
-        "id": "SIG-04",
-        "titre": "4. Diffusion d'images intimes par un ex-conjoint (Revenge Porn)",
-        "client": "Sarah L. (Particulier, 27 ans)",
-        "profil": "P1 Particulier — Réaction immédiate",
-        "plateforme": "Instagram & Groupe WhatsApp",
-        "url": "https://instagram.com/p/revenge_post_8821",
-        "jours_depuis_pub": 2,
-        "auteur_identifie": True,
-        "nuit_weekend": True,
-        "description": "L'ex-compagnon (identifié) a publié des photographies intimes prises du temps de la vie commune sur un compte public en identifiant les collègues de la victime.",
-        "ia_qualification": "Diffusion non consentie d'images à caractère sexuel / Revenge Porn (Art. 226-2-1 du Code pénal : 2 ans d'emprisonnement et 60 000 € d'amende).",
-        "ia_traite_auto": "Traitement 100% en IA locale (0 exposition externe des clichés intimes), empreinte numérique SHA-256 sans stockage cloud tiers, notification de retrait immédiat.",
-        "renvoi_avocat": "Auteur formellement identifié : l'avocat valide le constat R3 par commissaire d'astreinte et prépare une Citation Directe (J2A) pour obtenir condamnation et réparation à la même audience.",
-        "recommandation_r": "R3 Preuve authentique (320 € HT) + Nuit/WE (+150 € HT)",
-        "recommandation_j": "J2A Citation directe devant le Tribunal correctionnel (2 700 à 4 200 € HT)"
+        "id": "RPK-2026-04",
+        "label": "Cas 4 — Diffusion de clichés intimes par un ex-conjoint identifié (Revenge Porn)",
+        "client": "Sarah L.",
+        "profil": "Particulier (Sans abonnement)",
+        "formule": "R3 Preuve authentique (320 € HT) + Urgence Nuit/WE (+150 € HT)",
+        "plateforme": "Instagram & Messagerie",
+        "url": "https://instagram.com/p/post_id_88219",
+        "jours_pub": 2,
+        "auteur_connu": True,
+        "urgence_nuit": True,
+        "faits": "Mise en ligne par l'ex-conjoint (formellement identifié) de photographies intimes sans consentement, avec identification des proches de la victime.",
+        "ia_qualification": "Diffusion non consentie d'images à caractère sexuel (Art. 226-2-1 du Code pénal : 2 ans d'emprisonnement et 60 000 € d'amende).",
+        "ia_actions": "Traitement 100 % en IA locale (aucune exposition externe des images intimes), empreinte SHA-256, préparation de la notification de retrait immédiat.",
+        "avocat_arbitrage": "L'auteur étant identifié, l'avocat déclenche le constat de commissaire d'astreinte (R3) et prépare une Citation Directe (J2A) pour audience correctionnelle rapide.",
+        "suite_justice": "J2A Citation directe devant le Tribunal correctionnel (2 700 à 4 200 € HT)"
     },
     {
-        "id": "SIG-05",
-        "titre": "5. Cyberharcèlement en meute et Doxxing (Adresse divulguée)",
-        "client": "Mehdi K. (Journaliste indépendant)",
-        "profil": "P1 Particulier — Niveau 2 Preuve (39 € HT/mois)",
+        "id": "RPK-2026-05",
+        "label": "Cas 5 — Cyberharcèlement en meute et divulgation d'adresse (Doxxing)",
+        "client": "Mehdi K.",
+        "profil": "Abonné P1 Particulier — Niveau 2 Preuve (39 € HT/mois)",
+        "formule": "Inclus dans l'abonnement P1 Niveau 2 (6 signalements & captures R2 inclus)",
         "plateforme": "X (Twitter)",
-        "url": "https://x.com/raid_thread/status/189273645",
-        "jours_depuis_pub": 5,
-        "auteur_identifie": False,
-        "nuit_weekend": False,
-        "description": "Publication de l'adresse personnelle et du téléphone de la victime avec appel au raid : 'Allez tous l'attendre en bas de chez lui ce soir !'",
-        "ia_qualification": "Mise en danger par révélation d'informations personnelles / Doxxing (Art. 223-1-1 C. pén.) + Cyberharcèlement en meute (Art. 222-33-2-2 C. pén.).",
-        "ia_traite_auto": "Agrégation automatique des 45 tweets du raid en un seul dossier chronologique horodaté SHA-256, génération des signalements groupés X Corp.",
-        "renvoi_avocat": "Évaluation du péril physique immédiat, saisine du Pôle national de lutte contre la haine en ligne (PNLHL) et demande de protection.",
-        "recommandation_r": "Inclus dans P1 Niveau 2 (6 signalements et captures horodatées inclus/mois)",
-        "recommandation_j": "J2B Plainte au procureur (700 à 1 000 € HT)"
+        "url": "https://x.com/thread_attaque/status/189273645",
+        "jours_pub": 5,
+        "auteur_connu": False,
+        "urgence_nuit": False,
+        "faits": "Publication de l'adresse personnelle et du numéro de téléphone du client accompagnée d'appels à venir l'intimider à son domicile.",
+        "ia_qualification": "Mise en danger par révélation d'informations personnelles / Doxxing (Art. 223-1-1 C. pén.) et Cyberharcèlement (Art. 222-33-2-2 C. pén.).",
+        "ia_actions": "Agrégation automatique des messages du raid dans un rapport horodaté unique, préparation des signalements groupés.",
+        "avocat_arbitrage": "Qualification du péril imminent et saisine prioritaire du Pôle national de lutte contre la haine en ligne.",
+        "suite_justice": "J2B Plainte au procureur (700 à 1 000 € HT)"
     },
     {
-        "id": "SIG-06",
-        "titre": "6. Tweet diffamatoire d'un concurrent identifié contre un dirigeant",
-        "client": "Jean-Marc V. (PDG de FinTech)",
-        "profil": "P3 Entreprise — Niveau 1 Veille (229 € HT/mois)",
-        "plateforme": "LinkedIn & X",
-        "url": "https://linkedin.com/posts/concurrent_diffamation_992",
-        "jours_depuis_pub": 45,
-        "auteur_identifie": True,
-        "nuit_weekend": False,
-        "description": "Post public d'un concurrent nommé affirmant que le dirigeant a détourné les fonds de l'URSSAF et fait l'objet d'une interdiction de gérer.",
-        "ia_qualification": "Diffamation publique envers une personne physique/morale (Art. 29 al. 1 et 32 Loi du 29 juillet 1881).",
-        "ia_traite_auto": "Calcul du délai de prescription de 3 mois (reste 45 jours), capture probatoire et extraction des mentions légales de l'auteur.",
-        "renvoi_avocat": "Rigueur procédurale absolue de la Loi de 1881 (articulation précise des faits, qualification, visa des textes et élection de domicile) : rédaction par l'avocat d'une plainte avec constitution de partie civile (J2C) pour interrompre la prescription.",
-        "recommandation_r": "R3 Preuve authentique (250 € HT tarif abonné P3 Niv. 1)",
-        "recommandation_j": "J2C Partie civile directe devant le juge d'instruction (3 800 à 7 200 € HT)"
+        "id": "RPK-2026-06",
+        "label": "Cas 6 — Post LinkedIn diffamatoire d'un concurrent identifié (Dirigeant)",
+        "client": "Jean-Marc V. (Dirigeant de société)",
+        "profil": "Abonné P3 Entreprise — Niveau 1 Veille (229 € HT/mois)",
+        "formule": "R2 Preuve horodatée (15 € unité tarif abonné) + Constat R3 (250 €)",
+        "plateforme": "LinkedIn",
+        "url": "https://linkedin.com/posts/concurrent_99283",
+        "jours_pub": 45,
+        "auteur_connu": True,
+        "urgence_nuit": False,
+        "faits": "Publication publique d'un concurrent accusant nommément le dirigeant de détournement de fonds sociaux et de fraude fiscale.",
+        "ia_qualification": "Diffamation publique envers une personne physique (Art. 29 al. 1 et 32 de la Loi du 29 juillet 1881).",
+        "ia_actions": "Vérification du délai de prescription de 3 mois (45 jours restants), figeage de l'URL et extraction des informations de l'auteur.",
+        "avocat_arbitrage": "Formalisme strict de la Loi de 1881 : rédaction par l'avocat d'une plainte avec constitution de partie civile (J2C) pour interrompre valablement la prescription.",
+        "suite_justice": "J2C Partie civile directe devant le doyen des juges d'instruction (3 800 à 7 200 € HT)"
     },
     {
-        "id": "SIG-07",
-        "titre": "7. Usurpation d'identité d'un élu local en campagne",
-        "client": "Hélène R. (Maire / Personnalité politique)",
-        "profil": "P2 Personnalité — Niveau 2 Preuve (349 € HT/mois)",
+        "id": "RPK-2026-07",
+        "label": "Cas 7 — Faux compte usurpant l'identité d'une élue locale",
+        "client": "Hélène R.",
+        "profil": "Abonné P2 Personnalité — Niveau 2 Preuve (349 € HT/mois)",
+        "formule": "R4 Retrait judiciaire (1 700 € HT avec remise abonné -15%)",
         "plateforme": "Facebook & TikTok",
-        "url": "https://facebook.com/profile.php?id=1000998877_fake_maire",
-        "jours_depuis_pub": 4,
-        "auteur_identifie": False,
-        "nuit_weekend": False,
-        "description": "Création d'une page imitant la charte officielle de la candidate et diffusant de fausses déclarations polémiques à 3 semaines d'un scrutin.",
-        "ia_qualification": "Usurpation d'identité numérique (Art. 226-4-1 C. pén.) + Manœuvre frauduleuse électorale (Art. L. 97 du Code électoral).",
-        "ia_traite_auto": "Détection du faux profil par veille d'image, capture horodatée incluse, préparation de la mise en demeure Meta Platforms Ireland.",
-        "renvoi_avocat": "Rédaction de l'assignation en référé d'heure à heure devant le Tribunal Judiciaire sous astreinte (R4 avec remise -15%).",
-        "recommandation_r": "R4 Retrait judiciaire (1 700 € HT avec remise -15% abonné P2 Niv. 2)",
-        "recommandation_j": "J2B Plainte au procureur (700 à 1 000 € HT)"
+        "url": "https://facebook.com/profile.php?id=1000998877",
+        "jours_pub": 4,
+        "auteur_connu": False,
+        "urgence_nuit": False,
+        "faits": "Création d'une page imitant le compte officiel de la cliente et diffusant de fausses prises de position publiques.",
+        "ia_qualification": "Usurpation d'identité numérique (Art. 226-4-1 du Code pénal).",
+        "ia_actions": "Détection par veille d'image, capture certifiée R2 incluse dans le forfait, préparation de la notification Meta.",
+        "avocat_arbitrage": "Rédaction de la mise en demeure d'avocat et préparation de l'assignation en référé aux fins de suppression sous astreinte.",
+        "suite_justice": "J2B Plainte au procureur (700 à 1 000 € HT)"
     },
     {
-        "id": "SIG-08",
-        "titre": "8. Chantage à la webcam (Sextorsion financière)",
-        "client": "Thomas B. (Particulier, 19 ans)",
-        "profil": "Réaction directe (Cible principale)",
-        "plateforme": "Instagram DM & Discord",
-        "url": "https://discord.com/channels/extorsion_id_445",
-        "jours_depuis_pub": 1,
-        "auteur_identifie": False,
-        "nuit_weekend": True,
-        "description": "Menace imminente de diffuser une vidéo intime à tous les abonnés Instagram de la victime si un virement de 800 € n'est pas effectué dans l'heure.",
-        "ia_qualification": "Chantage (Art. 312-10 du Code pénal : 5 ans d'emprisonnement et 75 000 € d'amende) + Tentative d'extorsion.",
-        "ia_traite_auto": "Génération immédiate de l'accusé horodaté, figeage des captures de conversation et des identifiants du maître-chanteur, consignes d'urgence (ne pas payer, ne pas supprimer le compte).",
-        "renvoi_avocat": "Prise de relais psychologique et juridique immédiate par l'avocat de permanence 24/7, blocage préventif des comptes hôtes et plainte pénale.",
-        "recommandation_r": "R2 Preuve horodatée (150 € HT) + Nuit/WE (+75 € HT)",
-        "recommandation_j": "J2B Plainte au procureur (700 à 1 000 € HT)"
+        "id": "RPK-2026-08",
+        "label": "Cas 8 — Chantage à la vidéo intime (Sextorsion en cours)",
+        "client": "Thomas B.",
+        "profil": "Particulier (Sans abonnement)",
+        "formule": "R2 Preuve horodatée (150 € HT) + Urgence Nuit/WE (+75 € HT)",
+        "plateforme": "Instagram & Discord",
+        "url": "https://discord.com/channels/9988776655",
+        "jours_pub": 1,
+        "auteur_connu": False,
+        "urgence_nuit": True,
+        "faits": "Menace imminente de diffuser un enregistrement intime à la liste de contacts de la victime à défaut d'un virement immédiat de 800 €.",
+        "ia_qualification": "Chantage (Art. 312-10 du Code pénal : 5 ans d'emprisonnement et 75 000 € d'amende) et tentative d'extorsion.",
+        "ia_actions": "Figeage immédiat des captures d'écran et identifiants des comptes, envoi des consignes conservatoires d'urgence au client.",
+        "avocat_arbitrage": "Prise en charge immédiate par l'avocat de permanence 24h/24, demande de gel des comptes auprès des plateformes et dépôt de plainte.",
+        "suite_justice": "J2B Plainte au procureur (700 à 1 000 € HT)"
     },
     {
-        "id": "SIG-09",
-        "titre": "9. Article diffamatoire publié il y a 105 jours (Prescription 1881 dépassée !)",
-        "client": "Cabinet d'Architecture Horizon",
-        "profil": "Réaction directe",
-        "plateforme": "Blog d'urbanisme local",
-        "url": "https://blog-archi-critique.fr/horizon-corruption",
-        "jours_depuis_pub": 105,
-        "auteur_identifie": True,
-        "nuit_weekend": False,
-        "description": "Article accusant le cabinet d'architecture de malfaçons volontaires et de pots-de-vin, publié il y a 3 mois et demi (105 jours).",
-        "ia_qualification": "ALERTE IA LOCALE : Prescription de 3 mois (Art. 65 Loi du 29 juillet 1881) ACQUISE (105 jours > 90 jours) ! Irrécevabilité sur le terrain de la diffamation.",
-        "ia_traite_auto": "Calcul mathématique de l'échéance de prescription et blocage automatique des modèles d'actes 'Loi 1881' pour éviter toute faute professionnelle.",
-        "renvoi_avocat": "Haute valeur ajoutée de l'avocat : requalification sur le terrain du dénigrement commercial (Art. 1240 C. civ. — prescription de 5 ans) pour contourner légalement la prescription de 3 mois si la critique vise les prestations de l'entreprise.",
-        "recommandation_r": "R2 Preuve horodatée (150 € HT) + Mise en demeure",
-        "recommandation_j": "J1 Justice civile sur le fondement de l'Art. 1240 C. civ. (2 800 à 5 150 € HT)"
+        "id": "RPK-2026-09",
+        "label": "Cas 9 — Article diffamatoire publié il y a 105 jours (Prescription 3 mois dépassée)",
+        "client": "SARL Atelier Architecture Horizon",
+        "profil": "Particulier / Entreprise (Sans abonnement)",
+        "formule": "R2 Preuve horodatée (150 € HT)",
+        "plateforme": "Blog professionnel",
+        "url": "https://blog-urbanisme-info.fr/atelier-horizon",
+        "jours_pub": 105,
+        "auteur_connu": True,
+        "urgence_nuit": False,
+        "faits": "Publication il y a plus de trois mois d'un billet accusant l'entreprise de livrer des chantiers non conformes et dangereux.",
+        "ia_qualification": "ALERTE PRESCRIPTION : Délai de 3 mois (Art. 65 Loi du 29 juillet 1881) expiré (105 jours écoulés). Irrecevabilité d'une action en diffamation.",
+        "ia_actions": "Détection automatique du dépassement du délai de 90 jours et verrouillage préventif des modèles d'actes fondés sur la Loi de 1881.",
+        "avocat_arbitrage": "Plus-value décisive de l'avocat : réorientation de l'action sur le fondement du dénigrement commercial (Art. 1240 du Code civil, prescription de 5 ans) visant les prestations de la société.",
+        "suite_justice": "J1 Justice civile sur le fondement de l'Art. 1240 C. civ. (2 800 à 5 150 € HT)"
     },
     {
-        "id": "SIG-10",
-        "titre": "10. Harcèlement scolaire visant l'enfant d'une personnalité (Option Pack Proches)",
-        "client": "Enfant mineur de Mme Claire D. (Dirigeante / VIP)",
-        "profil": "P2 Personnalité + Option Pack Proches (+39 € HT/mois)",
-        "plateforme": "Snapchat & TikTok",
-        "url": "https://tiktok.com/@college_clash_92/video/112233",
-        "jours_depuis_pub": 2,
-        "auteur_identifie": True,
-        "nuit_weekend": False,
-        "description": "Vidéo humiliante filmée devant l'établissement scolaire et repartagée sur plusieurs comptes secondaires (miroirs).",
-        "ia_qualification": "Harcèlement scolaire et cyberharcèlement sur mineur (Art. 222-33-2-3 du Code pénal) + Atteinte au droit à l'image d'un mineur (Art. 226-1 C. pén.).",
-        "ia_traite_auto": "Détection de la vidéo originale et de 4 republications miroirs, horodatage certifié et signalement prioritaire Protection des Mineurs.",
-        "renvoi_avocat": "Intervention auprès des représentants légaux, notification chef d'établissement et mise en demeure / retrait sous 24h.",
-        "recommandation_r": "Couvert par l'Option Pack Proches (39 € HT/mois) de la formule P2",
-        "recommandation_j": "J2B Plainte au procureur ou médiation pénale (700 à 1 000 € HT)"
+        "id": "RPK-2026-10",
+        "label": "Cas 10 — Harcèlement visant l'enfant mineur d'une cliente (Option Pack Proches)",
+        "client": "Mme Claire D. (pour son fils mineur Lucas)",
+        "profil": "Abonné P2 Personnalité + Option Pack Proches (39 € HT/mois)",
+        "formule": "Inclus dans l'Option Pack Proches (Formule P2)",
+        "plateforme": "TikTok & Snapchat",
+        "url": "https://tiktok.com/@video_college_92/video/112233",
+        "jours_pub": 2,
+        "auteur_connu": True,
+        "urgence_nuit": False,
+        "faits": "Diffusion d'une vidéo humiliante visant un élève mineur, repartagée sur plusieurs comptes secondaires.",
+        "ia_qualification": "Cyberharcèlement sur mineur (Art. 222-33-2-3 C. pén.) et atteinte au droit à l'image (Art. 226-1 C. pén.).",
+        "ia_actions": "Identification de la vidéo source et de 4 comptes miroirs, horodatage certifié et préparation des notifications prioritaires protection des mineurs.",
+        "avocat_arbitrage": "Validation de la notification d'urgence et mise en demeure des représentants légaux et de la plateforme.",
+        "suite_justice": "J2B Plainte au procureur (700 à 1 000 € HT)"
     }
 ]
 
-# Initialisation de l'état de session
-if "selected_case" not in st.session_state:
-    st.session_state.selected_case = DIX_SIGNALEMENTS[0]
-if "dossier_cree" not in st.session_state:
-    st.session_state.dossier_cree = False
-if "avocat_valide" not in st.session_state:
-    st.session_state.avocat_valide = False
+# Initialisation de la mémoire de l'application
+if "active_case" not in st.session_state:
+    d0 = DOSSIERS_TYPES[0]
+    ts = datetime.datetime.now(datetime.timezone.utc).strftime("%d/%m/%Y à %H:%M:%S UTC")
+    raw = f"{d0['id']}|{d0['client']}|{d0['url']}|{ts}"
+    st.session_state.active_case = {
+        **d0,
+        "timestamp": ts,
+        "sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+        "statut_avocat": "EN ATTENTE DE VALIDATION AVOCAT",
+        "acte_valide": False,
+        "avocat_signataire": "Me. Associé de Permanence (Barreau de Paris)",
+        "acte_final": ""
+    }
 
 # ==============================================================================
-# BARRE LATÉRALE : ARCHITECTURE DOUBLE IA & ENGAGEMENTS (SLIDES 13, 17, 18)
+# BARRE LATÉRALE : GARANTIES DU CABINET REPLIK
 # ==============================================================================
 with st.sidebar:
     st.markdown("## 🛡️ CABINET REPLIK")
-    st.caption("« La rigueur juridique, à la vitesse d'Internet. »")
+    st.caption("La rigueur juridique, à la vitesse d'Internet.")
     st.divider()
     
-    st.markdown("### 🖥️ Architecture Souveraine")
-    st.success("🟢 **IA Prestataire (Veille Web)**\nOpérateur certifié & hébergé en France")
-    st.info("🔐 **IA Locale du Cabinet + n8n Local**\n0 donnée sensible envoyée à une IA externe pour la qualification.")
-    st.warning("⚖️ **Permanence Avocat 24h/24 - 7j/7**\n100 % des démarches validées par un avocat (Secret Pro & RCP).")
-    
+    st.markdown("### ⚡ Permanence 24h/24 & 7j/7")
+    if st.session_state.active_case["acte_valide"]:
+        st.success("🟢 **Dossier actif :** Validé et signé par l'avocat de permanence.")
+    else:
+        st.warning("🟠 **Dossier actif :** Pré-qualifié par l'IA locale — En attente de validation par l'avocat.")
+        
     st.divider()
-    st.markdown("### 📊 Engagements Client (Slide 13)")
+    st.markdown("### 🔒 Garanties Déontologiques")
     st.markdown("""
-    - **24h/24** : Avocat d'astreinte 7j/7
-    - **0 €** de frais cachés (tiers inclus)
-    - **100 %** validé par un avocat
-    - **1 semaine** de veille dès R1
-    - **0 donnée** sensible externe
+    - **Confidentialité absolue :** IA locale hébergée en France (0 donnée sensible envoyée à l'extérieur).
+    - **Contrôle humain :** 100 % des actes sont vérifiés et signés par un avocat.
+    - **Transparence :** Forfaits fixes connus d'avance, frais de tiers inclus.
+    - **Protection durable :** 1 semaine de veille anti-republication dès la formule R1 et conservation des preuves 5 ans.
     """)
-    st.caption("Conservation des preuves : 5 ans (suppression sur simple demande).")
 
 # ==============================================================================
-# BANNIÈRE D'EN-TÊTE
+# EN-TÊTE PRINCIPAL
 # ==============================================================================
 st.markdown("""
-    <div class="replik-banner">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <span class="step-badge">PROTOTYPE BÊTA — LAB EFB 2026</span>
-                <h1 style="margin:8px 0 4px 0; color:white;">CABINET REPLIK — Plus vite que la viralité.</h1>
-                <p style="margin:0; opacity:0.92; font-size:1.05em;">
-                    <b>L'IA détecte et prépare. L'avocat décide et agit.</b> | Parcours en 5 étapes : 01 Détection → 02 Qualification → 03 Validation → 04 Action → 05 Suivi
-                </p>
-            </div>
-        </div>
+    <div class="replik-header">
+        <span class="badge-role">CABINET D'AVOCATS EN DROIT DU NUMÉRIQUE & DE LA RÉPUTATION</span>
+        <h1 style="margin:8px 0 4px 0; color:white;">CABINET REPLIK — Plus vite que la viralité.</h1>
+        <p style="margin:0; opacity:0.9; font-size:1.02em;">
+            L'IA détecte et prépare en temps réel. L'avocat décide, qualifie et agit 24h/24.
+        </p>
     </div>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# LES 4 ONGLETS (LES 3 ÉCRANS DE LA SLIDE 18 + LE BANC D'ESSAI DES 10 CAS)
+# NAVIGATION : ÉCRAN 1 (CLIENT) vs ÉCRANS 2 & 3 (AVOCAT)
 # ==============================================================================
-tab_ecran1, tab_ecran2, tab_ecran3, tab_labo = st.tabs([
-    "📝 ÉCRAN 1 : Formulaire & Détection (Étapes 01-02)",
-    "🔐 ÉCRAN 2 : Accusé Horodaté & Validation Avocat (Étapes 02-04)",
-    "📈 ÉCRAN 3 : Suivi Client, Veille 7j & Devis (Étape 05)",
-    "🧪 BANC DE TEST : Les 10 Faux Signalements & n8n (Slide 18)"
+tab_client, tab_avocat_dossier, tab_avocat_radar = st.tabs([
+    "👤 ÉCRAN 1 : ESPACE CLIENT (Signaler & Suivre mon dossier)",
+    "⚖️ ÉCRAN 2 : POSTE AVOCAT (Qualification IA, Prescription & Actes)",
+    "📡 ÉCRAN 3 : SUPERVISION CABINET (Radar de Veille & Portefeuille)"
 ])
 
-# ------------------------------------------------------------------------------
-# ÉCRAN 1 : FORMULAIRE DE SIGNALEMENT & DÉTECTION IA (SLIDE 16 & 18)
-# ------------------------------------------------------------------------------
-with tab_ecran1:
-    st.subheader("📝 Écran 1 : Mise en route par formulaire simple ou alerte de veille")
-    st.caption("Conformément à la Slide 16 : Dès le signalement, l'IA locale fige la preuve, calcule la prescription et génère l'accusé horodaté.")
-    
-    col_f1, col_f2 = st.columns([1.25, 1])
-    
-    with col_f1:
-        st.markdown("#### 1. Sélectionner un cas parmi les 10 faux signalements (Slide 18) ou saisir un cas")
-        titres_cas = [c["titre"] for c in DIX_SIGNALEMENTS] + ["➕ Saisie libre d'un nouveau signalement en direct"]
-        choix_titre = st.selectbox("Banc de test Replik :", titres_cas)
-        
-        if choix_titre != "➕ Saisie libre d'un nouveau signalement en direct":
-            cas_actif = next(c for c in DIX_SIGNALEMENTS if c["titre"] == choix_titre)
-        else:
-            cas_actif = {
-                "id": "SIG-LIVE",
-                "titre": "Signalement en direct Jury EFB",
-                "client": "Client Test Jury EFB",
-                "profil": "Réaction directe",
-                "plateforme": "X / Instagram / Google",
-                "url": "https://x.com/user/status/999888777",
-                "jours_depuis_pub": 5,
-                "auteur_identifie": False,
-                "nuit_weekend": False,
-                "description": "Propos diffamatoires ou montage illicite portant atteinte à l'honneur et à l'image du client.",
-                "ia_qualification": "Diffamation publique (Art. 29 Loi du 29 juillet 1881) & Atteinte à l'image.",
-                "ia_traite_auto": "Horodatage SHA-256 local, vérification du délai de 3 mois, préparation notification DSA.",
-                "renvoi_avocat": "Vérification de la qualification par l'avocat d'astreinte et signature de la mise en demeure.",
-                "recommandation_r": "R2 Preuve horodatée (150 € HT)",
-                "recommandation_j": "J2B Plainte au procureur (700 à 1 000 € HT)"
-            }
-
-        nom_client = st.text_input("Identité du client / Victime :", value=cas_actif["client"])
-        profil_client = st.selectbox(
-            "Catégorie de cible / Abonnement Prévention :",
-            [
-                "Cible Principale : Particulier non abonné (Formule Réaction à l'acte)",
-                "Abonné P1 Particulier — Niveau 1 Veille (29 € HT/mois)",
-                "Abonné P1 Particulier — Niveau 2 Preuve (39 € HT/mois)",
-                "Abonné P1 Particulier — Niveau 3 Justice (59 € HT/mois)",
-                "Abonné P2 Personnalité — Niveau 1 Veille (249 € HT/mois)",
-                "Abonné P2 Personnalité — Niveau 2 Preuve (349 € HT/mois)",
-                "Abonné P2 Personnalité — Niveau 3 Justice (449 € HT/mois)",
-                "Abonné P3 Entreprise — Niveau 1 Veille (229 € HT/mois)",
-                "Abonné P3 Entreprise — Niveau 2 Preuve (299 € HT/mois)",
-                "Abonné P3 Entreprise — Niveau 3 Justice (369 € HT/mois)"
-            ],
-            index=0
+# ==============================================================================
+# ÉCRAN 1 : INTERFACE 100 % CLIENT (DÉPÔT, ACCUSÉ HORODATÉ & SUIVI EN 5 ÉTAPES)
+# ==============================================================================
+with tab_client:
+    col_c_head1, col_c_head2 = st.columns([2, 1])
+    with col_c_head1:
+        st.subheader("👤 Portail Client — Signaler une atteinte en ligne")
+        st.write("Confiez-nous le retrait de votre contenu et la sauvegarde immédiate de vos preuves. Un avocat de permanence prend le relais 24h/24.")
+    with col_c_head2:
+        # Sélecteur discret pour pré-remplir le formulaire en 1 clic pendant la présentation
+        choix_demo = st.selectbox(
+            "⚡ Remplissage rapide (Cas types) :",
+            [d["label"] for d in DOSSIERS_TYPES]
         )
+        preset = next(d for d in DOSSIERS_TYPES if d["label"] == choix_demo)
+
+    st.divider()
+    
+    col_form, col_suivi = st.columns([1.05, 1])
+    
+    # --- COLONNE GAUCHE : FORMULAIRE DE SIGNALEMENT CLIENT ---
+    with col_form:
+        st.markdown("#### 1. Décrire la situation et choisir votre formule")
         
-        c_plat, c_url = st.columns(2)
+        c_nom, c_statut = st.columns(2)
+        with c_nom:
+            input_client = st.text_input("Votre nom ou raison sociale :", value=preset["client"])
+        with c_statut:
+            input_profil = st.selectbox(
+                "Votre situation :",
+                [
+                    "Particulier (Demande ponctuelle)",
+                    "Entreprise / Marque (Demande ponctuelle)",
+                    "Abonné Prévention P1 Particulier (29 à 59 € HT/mois)",
+                    "Abonné Prévention P2 Personnalité (249 à 449 € HT/mois)",
+                    "Abonné Prévention P3 Entreprise (229 à 369 € HT/mois)"
+                ]
+            )
+            
+        c_plat, c_date = st.columns([1.4, 1])
         with c_plat:
-            plateforme_input = st.text_input("Plateforme concernée :", value=cas_actif["plateforme"])
-        with c_url:
-            url_input = st.text_input("URL exacte du contenu :", value=cas_actif["url"])
-            
-        c_date, c_aut, c_nuit = st.columns(3)
+            input_plat = st.text_input("Plateforme ou site concerné :", value=preset["plateforme"])
         with c_date:
-            date_pub = st.date_input(
-                "Date de 1re publication :",
-                value=datetime.date.today() - datetime.timedelta(days=cas_actif["jours_depuis_pub"])
+            input_date = st.date_input(
+                "Date d'apparition du contenu :",
+                value=datetime.date.today() - datetime.timedelta(days=preset["jours_pub"])
             )
-        with c_aut:
-            auteur_connu = st.checkbox("Auteur déjà identifié ?", value=cas_actif["auteur_identifie"])
-        with c_nuit:
-            nuit_we = st.checkbox("Urgence Nuit / WE / Férié ?", value=cas_actif["nuit_weekend"])
             
-        contenu_input = st.text_area(
-            "Description ou transcription du contenu litigieux (traité par l'IA locale du cabinet) :",
-            value=cas_actif["description"],
-            height=110
+        input_url = st.text_input("Lien (URL) exact du contenu à faire retirer :", value=preset["url"])
+        input_faits = st.text_area(
+            "Que se passe-t-il ? (Décrivez brièvement le contenu ou collez le message reçu) :",
+            value=preset["faits"],
+            height=100
         )
         
-        if st.button("🚨 DÉCLENCHER LE WORKFLOW n8n LOCAL & GÉNÉRER L'ACCUSÉ HORODATÉ", type="primary", use_container_width=True):
-            with st.spinner("Exécution du workflow n8n en local : capture serveur, hachage SHA-256 et pré-qualification juridique..."):
-                time.sleep(0.9)
-                horodatage_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-                chaine_preuve = f"REPLIK_LOCAL|{nom_client}|{url_input}|{horodatage_utc}|{contenu_input}"
-                empreinte_sha256 = hashlib.sha256(chaine_preuve.encode("utf-8")).hexdigest()
+        st.file_uploader("Joindre une capture d'écran, photo ou vidéo (Chiffrement local — 0 exposition externe) :", type=["png", "jpg", "jpeg", "mp4", "pdf"])
+        
+        st.markdown("##### Choisissez votre niveau de protection (Forfait fixe, 0 € de frais cachés) :")
+        choix_formule = st.radio(
+            "Formule d'intervention :",
+            [
+                "R1 Essentiel (125 € HT) — Signalement officiel aux plateformes, suivi du retrait et 1 semaine de veille anti-republication",
+                "R2 Preuve horodatée (150 € HT) — Formule R1 + Capture certifiée inaltérable et rapport de preuve conservé 5 ans",
+                "R3 Preuve authentique (320 € HT) — Formule R1 + Constat officiel par Commissaire de justice d'astreinte 24h/24",
+                "R4 Retrait judiciaire (1 700 à 2 650 € HT) — Mise en demeure d'avocat puis assignation en référé devant le Tribunal Judiciaire sous astreinte",
+                "Utiliser les crédits inclus dans mon abonnement Prévention (P1 / P2 / P3)"
+            ],
+            index=1
+        )
+        
+        c_opt1, c_opt2 = st.columns(2)
+        with c_opt1:
+            input_auteur = st.checkbox("Je connais l'identité de l'auteur", value=preset["auteur_connu"])
+        with c_opt2:
+            input_nuit = st.checkbox("Intervention urgente Nuit / Week-end / Jour férié (+75 € HT sur R1/R2, +150 € HT sur R3)", value=preset["urgence_nuit"])
+            
+        if st.button("🛡️ PROTÉGER MES DROITS & GÉNÉRER MON ACCUSÉ HORODATÉ", type="primary", use_container_width=True):
+            with st.spinner("Sécurisation de la preuve sur le serveur interne du cabinet et alerte de l'avocat de permanence..."):
+                time.sleep(0.8)
+                now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%d/%m/%Y à %H:%M:%S UTC")
+                jours_ecoules = (datetime.date.today() - input_date).days
+                payload = f"REPLIK|{input_client}|{input_url}|{now_utc}|{input_faits}"
+                sha = hashlib.sha256(payload.encode("utf-8")).hexdigest()
                 
-                st.session_state.selected_case = cas_actif
-                st.session_state.dossier_info = {
-                    "id": cas_actif["id"],
-                    "client": nom_client,
-                    "profil": profil_client,
-                    "plateforme": plateforme_input,
-                    "url": url_input,
-                    "date_pub": date_pub,
-                    "auteur_connu": auteur_connu,
-                    "nuit_we": nuit_we,
-                    "contenu": contenu_input,
-                    "timestamp": horodatage_utc,
-                    "sha256": empreinte_sha256
+                st.session_state.active_case = {
+                    **preset,
+                    "client": input_client,
+                    "profil": input_profil,
+                    "formule": choix_formule,
+                    "plateforme": input_plat,
+                    "url": input_url,
+                    "jours_pub": jours_ecoules,
+                    "auteur_connu": input_auteur,
+                    "urgence_nuit": input_nuit,
+                    "faits": input_faits,
+                    "timestamp": now_utc,
+                    "sha256": sha,
+                    "statut_avocat": "EN COURS DE VÉRIFICATION PAR L'AVOCAT DE PERMANENCE",
+                    "acte_valide": False,
+                    "avocat_signataire": "Me. Associé de Permanence (Barreau de Paris)",
+                    "acte_final": ""
                 }
-                st.session_state.dossier_cree = True
-                st.session_state.avocat_valide = False
-                st.success("✅ Dossier enregistré et preuve figée en local ! Rendez-vous sur l'**ÉCRAN 2 (Accusé Horodaté & Validation Avocat)**.")
+                st.success("✅ Votre demande est prise en charge ! Votre accusé horodaté est disponible ci-contre.")
 
-    with col_f2:
-        st.markdown("#### 2. Diagnostic temps réel de l'IA Locale (Étape 02)")
+    # --- COLONNE DROITE : ACCUSÉ HORODATÉ & SUIVI DU DOSSIER PAR LE CLIENT ---
+    with col_suivi:
+        ac = st.session_state.active_case
+        st.markdown("#### 2. Votre Accusé de Réception Horodaté")
+        st.caption("Ce certificat prouve que le contenu existait à cette date précise, même si son auteur le supprime dans quelques minutes.")
         
-        # Calculateur de la prescription de 3 mois (Loi du 29 juillet 1881 - Slide 3)
-        jours_ecoules = (datetime.date.today() - date_pub).days
-        jours_restants = 90 - jours_ecoules
-        date_butoir = date_pub + datetime.timedelta(days=90)
+        st.markdown(f"""
+        <div class="cert-box">
+            <b>🛡️ ACCUSÉ DE RÉCEPTION & CERTIFICAT D'HORODATAGE — CABINET REPLIK</b><br>
+            -----------------------------------------------------------------------<br>
+            <b>N° DE DOSSIER :</b> {ac['id']} | <b>CLIENT :</b> {ac['client']}<br>
+            <b>DATE & HEURE CERTIFIÉES :</b> {ac['timestamp']}<br>
+            <b>URL CONSTATÉE :</b> {ac['url']}<br>
+            <b>EMPREINTE NUMÉRIQUE SHA-256 :</b><br>
+            {ac['sha256']}<br>
+            <b>CONSERVATION :</b> Coffre-fort interne du cabinet (France) — Durée : 5 ans
+        </div>
+        """, unsafe_allow_html=True)
         
-        if jours_restants > 15:
-            st.success(f"⏱️ **Compteur Loi du 29 juillet 1881 (3 mois) :**\nIl reste **{jours_restants} jours** pour agir (Date butoir : {date_butoir.strftime('%d/%m/%Y')}).")
-        elif jours_restants > 0:
-            st.warning(f"⚠️ **ALERTE PRESCRIPTION IMMINENTE :**\nPlus que **{jours_restants} jours** avant prescription de l'action presse !")
+        st.write("")
+        st.markdown("#### 3. Suivi de votre dossier en temps réel")
+        
+        # Affichage dynamique des 5 étapes selon que l'avocat a validé ou non sur l'Écran 2
+        valide = ac["acte_valide"]
+        
+        s1, s2, s3, s4, s5 = st.columns(5)
+        with s1:
+            st.markdown("""<div class="step-card-done"><b>01 Détection</b><br><small>✅ URL & preuves capturées</small></div>""", unsafe_allow_html=True)
+        with s2:
+            st.markdown("""<div class="step-card-done"><b>02 Préparation</b><br><small>✅ Dossier prêt en interne</small></div>""", unsafe_allow_html=True)
+        with s3:
+            if valide:
+                st.markdown("""<div class="step-card-done"><b>03 Validation</b><br><small>✅ Validé par l'avocat</small></div>""", unsafe_allow_html=True)
+            else:
+                st.markdown("""<div class="step-card-active"><b>03 Validation</b><br><small>⏳ Avocat 24/7 saisi</small></div>""", unsafe_allow_html=True)
+        with s4:
+            if valide:
+                st.markdown("""<div class="step-card-done"><b>04 Action</b><br><small>🚀 Acte officiel envoyé</small></div>""", unsafe_allow_html=True)
+            else:
+                st.markdown("""<div class="step-card-wait"><b>04 Action</b><br><small>En attente signature</small></div>""", unsafe_allow_html=True)
+        with s5:
+            st.markdown("""<div class="step-card-done"><b>05 Suivi 7j</b><br><small>🛡️ Veille anti-republication active</small></div>""", unsafe_allow_html=True)
+
+        st.write("")
+        if valide:
+            st.success(f"⚖️ **Mise à jour de votre avocat ({ac['avocat_signataire']}) :** Votre dossier a été validé et la démarche officielle de retrait a été engagée. Vous pouvez télécharger la copie de l'acte ci-dessous.")
+            st.download_button(
+                "📥 Télécharger la copie de l'acte envoyé par mon avocat",
+                data=ac["acte_final"],
+                file_name=f"Copie_Client_{ac['id']}.txt",
+                use_container_width=True
+            )
         else:
-            st.error(f"🚨 **PRESCRIPTION DE 3 MOIS DÉPASSÉE ({jours_ecoules} jours) !**\nL'IA locale bloque automatiquement les actes fondés sur la Loi de 1881 et renvoie à l'avocat pour basculer sur le droit commun (Art. 1240 C. civ. — 5 ans).")
-            
-        st.markdown("##### 🤖 Répartition IA Locale vs Avocat (Slide 17 & 18)")
-        st.info(f"**Ce que l'IA locale traite automatiquement :**\n{cas_actif['ia_traite_auto']}")
-        st.warning(f"**Ce que l'IA renvoie obligatoirement à l'avocat de permanence :**\n{cas_actif['renvoi_avocat']}")
-        
-        st.markdown("##### 💡 Pré-qualification juridique proposée par l'IA locale :")
-        st.write(cas_actif["ia_qualification"])
+            st.info("👨‍⚖️ **Prochaine étape :** L'avocat de permanence examine actuellement votre dossier (délai moyen : moins de 15 minutes). Aucune démarche n'est engagée sans son contrôle et sa signature.")
 
-# ------------------------------------------------------------------------------
-# ÉCRAN 2 : ACCUSÉ HORODATÉ & VALIDATION AVOCAT 24/7 (SLIDES 16, 17, 18)
-# ------------------------------------------------------------------------------
-with tab_ecran2:
-    st.subheader("🔐 Écran 2 : Accusé Horodaté Certifié & Validation par l'Avocat de Permanence")
+        st.markdown("##### 🔍 Veille anti-republication (Incluse pendant 1 semaine)")
+        df_suivi_client = pd.DataFrame([
+            {"Cible surveillée": ac["plateforme"], "État du lien": "Retrait exigé" if valide else "Preuve figée", "Republications (Miroirs)": "0 copie détectée"},
+            {"Cible surveillée": "Moteurs de recherche & Réseaux", "État du lien": "Surveillance continue", "Republications (Miroirs)": "0 copie détectée"}
+        ])
+        st.dataframe(df_suivi_client, use_container_width=True, hide_index=True)
+
+# ==============================================================================
+# ÉCRAN 2 : POSTE AVOCAT DE PERMANENCE (QUALIFICATION IA LOCALE & VALIDATION)
+# ==============================================================================
+with tab_avocat_dossier:
+    ac = st.session_state.active_case
     
-    if not st.session_state.dossier_cree:
-        st.info("👆 Cliquez d'abord sur le bouton **« Déclencher le workflow n8n local »** dans l'Écran 1 pour générer l'accusé horodaté.")
+    st.subheader(f"⚖️ Poste de Permanence Avocat — Dossier {ac['id']} ({ac['client']})")
+    st.caption("Interface interne réservée aux avocats du Cabinet Replik. Analyse effectuée par l'IA locale du cabinet (aucune donnée transmise à l'extérieur).")
+    
+    # Bandeau supérieur : Alerte Prescription 3 mois (Loi du 29 juillet 1881)
+    jours_ecoules = ac["jours_pub"]
+    jours_restants = 90 - jours_ecoules
+    date_limite = (datetime.date.today() - datetime.timedelta(days=jours_ecoules)) + datetime.timedelta(days=90)
+    
+    col_k1, col_k2, col_k3, col_k4 = st.columns(4)
+    col_k1.metric("Ancienneté de la publication", f"{jours_ecoules} jours")
+    if jours_restants > 0:
+        col_k2.metric("Prescription Presse (3 mois)", f"J - {jours_restants}", f"Échéance : {date_limite.strftime('%d/%m/%Y')}")
     else:
-        d = st.session_state.dossier_info
-        c = st.session_state.selected_case
+        col_k2.metric("Prescription Presse (3 mois)", "EXPIRÉE", f"Dépassée de {abs(jours_restants)} jours", delta_color="inverse")
+    col_k3.metric("Identification de l'auteur", "Connu" if ac["auteur_connu"] else "Anonyme / Pseudonyme")
+    col_k4.metric("Permanence Nuit / WE", "Oui (Majoration)" if ac["urgence_nuit"] else "Heures ouvrées")
+
+    if jours_restants <= 0:
+        st.error("🚨 **ALERTE IA LOCALE — PRESCRIPTION LOI 1881 ACQUISE :** Le délai de 3 mois est dépassé. Les modèles d'actes 'Diffamation / Injure publique' sont automatiquement verrouillés. Bascule recommandée vers la responsabilité civile de droit commun (Art. 1240 C. civ. — Dénigrement, prescription de 5 ans).")
+    elif jours_restants <= 15:
+        st.warning(f"⚠️ **URGENCE PROCÉDURALE :** Il ne reste que **{jours_restants} jours** pour interrompre la prescription par un acte d'instruction ou une citation.")
+
+    st.divider()
+    
+    col_ia, col_val = st.columns([1.1, 1])
+    
+    # --- COLONNE GAUCHE : PRÉ-ANALYSE DE L'IA LOCALE ---
+    with col_ia:
+        st.markdown("#### 1. Synthèse préparatoire de l'IA Locale (Étape 02)")
         
-        col_acc, col_av = st.columns([1.1, 1])
+        st.markdown("**Faits et contenu figés sous empreinte SHA-256 :**")
+        st.info(f"« {ac['faits']} »\n\n🔗 **URL :** `{ac['url']}`\n🔐 **Hash :** `{ac['sha256'][:36]}...`")
         
-        with col_acc:
-            st.markdown("#### 1. Accusé Horodaté Envoyé au Client (Slide 16 & 18)")
-            st.markdown(f"""
-            <div class="hash-cert">
-                <b>🛡️ CERTIFICAT D'HORODATAGE & DE FIGEAGE PROBATOIRE — CABINET REPLIK</b><br>
-                -------------------------------------------------------------------------<br>
-                <b>RÉFÉRENCE DOSSIER :</b> {d['id']} | <b>CLIENT :</b> {d['client']}<br>
-                <b>HORODATAGE CERTIFIÉ :</b> {d['timestamp']}<br>
-                <b>SERVEUR D'EXÉCUTION :</b> Instance IA Locale Replik (Hébergement France - 0 Cloud Externe)<br>
-                <b>URL DU CONTENU FIGÉ :</b> {d['url']}<br>
-                <b>EMPREINTE SHA-256 INALTÉRABLE :</b><br>
-                {d['sha256']}<br>
-                <b>GARANTIE DE CONSERVATION :</b> 5 ans en coffre-fort numérique (suppression sur demande)
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.write("")
-            st.markdown("#### 2. Choix du palier de Preuve & Réaction (Slide 20)")
-            palier_choisi = st.radio(
-                "Sélectionner le niveau de preuve requis :",
-                [
-                    "R1 Essentiel (125 € HT) — Détection, signalement plateformes, suivi & 1 sem. de veille",
-                    "R2 Preuve horodatée (150 € HT) — R1 + Capture certifiée inaltérable conservée 5 ans",
-                    "R3 Preuve authentique (320 € HT) — R1 + Constat de Commissaire de justice d'astreinte 24h/24",
-                    "R4 Retrait judiciaire (1 700 à 2 650 € HT) — Mise en demeure + Référé devant le TJ sous astreinte"
-                ],
-                index=1
-            )
-            
-        with col_av:
-            st.markdown("#### 3. Étape 03 : Validation par l'Avocat de Permanence 24h/24")
-            st.markdown("""
-            > **Garantie Déontologique (Slide 13 & 17) :** *100 % des démarches sont validées par un avocat. Nous promettons des moyens, jamais un résultat.*
-            """)
-            
-            avocat_signataire = st.selectbox(
-                "Avocat d'astreinte connecté :",
-                [
-                    "Me. Associé Pénal & Presse (Permanence 24/7 - Barreau de Paris)",
-                    "Me. Associé Référés & Numérique (Permanence 24/7 - Barreau de Paris)"
-                ]
-            )
-            
-            modele_acte = st.selectbox(
-                "Modèle d'acte pré-rédigé par l'IA locale (Slide 18) :",
-                [
-                    "Acte 1 : Notification formelle de retrait aux plateformes (DSA Art. 16 & LCEN Art. 6-I-5) [R1/R2/R3]",
-                    "Acte 2 : Mise en demeure d'avocat & Projet d'assignation en référé sous astreinte [R4]",
-                    "Acte 3 : Plainte pénale au Procureur / Citation directe / Partie civile [Gamme Justice J2A/J2B/J2C]"
-                ]
-            )
-            
-            amendement_avocat = st.text_area(
-                "Contrôle & observations de l'avocat avant signature :",
-                value=f"Qualification vérifiée : {c['ia_qualification']} Délai de prescription contrôlé. Envoi immédiat.",
-                height=95
-            )
-            
-            valider_box = st.checkbox("✅ En qualité d'avocat de permanence, je valide la qualification juridique et j'engage la démarche sous ma signature professionnelle.")
-            
-            if valider_box:
-                st.session_state.avocat_valide = True
-                st.success("✅ Acte déverrouillé et signé ! Consultez l'acte ci-dessous ou passez à l'**ÉCRAN 3 (Suivi Client & Devis)**.")
+        st.markdown("**Qualifications juridiques pré-identifiées par l'IA locale :**")
+        st.success(f"⚖️ {ac['ia_qualification']}")
+        
+        st.markdown("**Répartition des tâches (Automatisation n8n locale vs Avocat) :**")
+        st.markdown(f"- 🤖 **Traité automatiquement par l'IA locale :** {ac['ia_actions']}")
+        st.markdown(f"- 👨‍⚖️ **Point de décision renvoyé à l'avocat :** {ac['avocat_arbitrage']}")
+        st.markdown(f"- 💼 **Passerelle Contentieux (Gamme Justice) suggérée :** `{ac['suite_justice']}`")
 
-        if st.session_state.avocat_valide:
-            st.divider()
-            st.markdown("#### 📄 Acte Juridique Généré par l'IA Locale et Validé par l'Avocat (Étape 04 : Action)")
-            date_str = datetime.date.today().strftime("%d/%m/%Y")
-            
-            texte_acte = f"""CABINET REPLIK — AVOCATS AU BARREAU DE PARIS
-Permanence Cyber-Urgence 24h/24 & 7j/7 | Signataire : {avocat_signataire}
-Référence Dossier : {d['id']} | Client : {d['client']}
+    # --- COLONNE DROITE : CONTRÔLE HUMAIN & GÉNÉRATION D'ACTES ---
+    with col_val:
+        st.markdown("#### 2. Validation Déontologique & Signature (Étapes 03 & 04)")
+        
+        avocat_choix = st.selectbox(
+            "Avocat d'astreinte intervenant :",
+            [
+                "Me. Associé Pénal & Presse (Barreau de Paris — Permanence 24/7)",
+                "Me. Associé Contentieux Numérique & Référés (Barreau de Paris — Permanence 24/7)"
+            ]
+        )
+        
+        type_acte = st.selectbox(
+            "Sélectionner l'acte pré-rédigé à émettre :",
+            [
+                "1. Notification officielle de contenu illicite à la plateforme (Art. 16 DSA & Art. 6-I-5 LCEN)",
+                "2. Mise en demeure d'avocat & Projet d'assignation en référé retrait sous astreinte (Formule R4)",
+                "3. Requête aux fins d'identification de l'auteur anonyme (Art. 145 CPC / Réquisition IP)",
+                "4. Plainte pénale / Citation directe / Constitution de partie civile (Gamme Justice J2A/J2B/J2C)"
+            ]
+        )
+        
+        notes_avocat = st.text_area(
+            "Instructions et amendements de l'avocat :",
+            value=f"Qualification confirmée. {ac['avocat_arbitrage']}",
+            height=90
+        )
+        
+        date_jour = datetime.date.today().strftime("%d/%m/%Y")
+        brouillon_acte = f"""CABINET REPLIK — AVOCATS AU BARREAU DE PARIS
+Permanence Cyber-Urgence 24h/24 | {avocat_choix}
+Dossier n° {ac['id']} — Affaire : {ac['client']}
 
-Paris, le {date_str}
+Paris, le {date_jour}
 
-OBJET : {modele_acte}
-Destinataire : Département Juridique / Hébergeur de la plateforme {d['plateforme']}
-URL visée : {d['url']}
+OBJET : {type_acte}
+Destinataire : Service Juridique / Hébergeur de {ac['plateforme']}
+URL litigieuse : {ac['url']}
 
 Madame, Monsieur,
 
-Le Cabinet REPLIK agit en qualité de conseil de {d['client']}.
+Le Cabinet REPLIK est le conseil de {ac['client']}.
 
-1. CONSTATATION ET PREUVE CERTIFIÉE
-En date du {d['timestamp']}, notre système de figeage probatoire souverain a constaté la diffusion à l'adresse URL {d['url']} du contenu suivant :
-« {d['contenu']} »
+1. CONSTATATION ET FIGEAGE PROBATOIRE
+En date du {ac['timestamp']}, notre système interne a constaté la publication à l'adresse {ac['url']} du contenu suivant :
+« {ac['faits']} »
 
-Ce contenu a fait l'objet d'un accusé horodaté inaltérable (Empreinte SHA-256 : {d['sha256']}) conservé 5 ans conformément à nos engagements probatoires ({palier_choisi}).
+Ce contenu a fait l'objet d'un figeage probatoire inaltérable (Empreinte SHA-256 : {ac['sha256']}) conservé pour une durée de 5 ans.
 
-2. QUALIFICATION JURIDIQUE VALIDÉE PAR L'AVOCAT DE PERMANENCE
-Après contrôle humain par l'avocat soussigné, ces faits caractérisent manifestement :
-{c['ia_qualification']}
+2. QUALIFICATION JURIDIQUE VALIDÉE PAR L'AVOCAT
+Après vérification par l'avocat soussigné, ces faits caractérisent manifestement :
+{ac['ia_qualification']}
 
-Observations stratégiques de l'avocat :
-{amendement_avocat}
+Observations complémentaires :
+{notes_avocat}
 
-3. MISE EN DEMEURE DE RETRAIT IMMÉDIAT & CONSERVATION DES LOGS D'IDENTIFICATION
-Conformément à l'article 16 du Règlement européen sur les services numériques (DSA) et à l'article 6-I-5 de la LCEN, la connaissance de l'illicéité est formellement acquise dès réception de la présente.
-Nous vous enjoignons de procéder au retrait immédiat du contenu et d'empêcher toute republication miroir, ainsi que de préserver l'intégralité des données d'identification de l'auteur (Art. 6-II LCEN) aux fins de poursuites judiciaires.
+3. DEMANDES FORMELLES (RETRAIT IMMÉDIAT & CONSERVATION DES DONNÉES)
+En application de l'article 16 du Règlement européen sur les services numériques (DSA) et de l'article 6-I-5 de la LCEN, la connaissance de l'illicéité du contenu est acquise dès réception de la présente notification par ministère d'avocat.
 
-{avocat_signataire}
-Acte signé électroniquement — Cabinet REPLIK"""
+Nous vous mettons en demeure de :
+- Retirer ou rendre inaccessible le contenu visé sans délai et prévenir toute republication ;
+- Conserver l'intégralité des données d'identification et de connexion de l'auteur (adresse IP, horodatages, coordonnées de création du compte) conformément à l'article 6-II de la LCEN.
 
-            st.text_area("Texte final de l'acte :", value=texte_acte, height=320)
-            st.download_button("📥 Télécharger l'acte officiel (.txt)", data=texte_acte, file_name=f"REPLIK_{d['id']}_ACTE.txt")
+À défaut d'exécution immédiate, nous engagerons toute voie de droit utile (référé sous astreinte et poursuites pénales/civiles).
 
-# ------------------------------------------------------------------------------
-# ÉCRAN 3 : SUIVI CLIENT, VEILLE 7 JOURS & CALCULATEUR DE FORFAITS (SLIDES 16, 18, 19-22)
-# ------------------------------------------------------------------------------
-with tab_ecran3:
-    st.subheader("📈 Écran 3 : Suivi en Temps Réel, Veille Anti-Republication & Transparence Tarifaire")
-    st.caption("Répond aux 4 besoins de la cible (Slide 10) : 1. Disparition rapide, 2. Preuve incontestable, 3. Discrétion, 4. Transparence du prix.")
+{avocat_choix}
+Signature électronique certifiée — Barreau de Paris"""
+
+        st.text_area("Aperçu de l'acte (modifiable par l'avocat avant signature) :", value=brouillon_acte, height=230)
+        
+        if st.button("✅ VALIDER LA QUALIFICATION, SIGNER L'ACTE & NOTIFIER LE CLIENT", type="primary", use_container_width=True):
+            st.session_state.active_case["acte_valide"] = True
+            st.session_state.active_case["avocat_signataire"] = avocat_choix
+            st.session_state.active_case["acte_final"] = brouillon_acte
+            st.session_state.active_case["statut_avocat"] = "VALIDÉ ET ENVOYÉ PAR L'AVOCAT"
+            st.success("✅ Acte signé et transmis ! Le statut du client sur l'Écran 1 est désormais passé au vert.")
+
+# ==============================================================================
+# ÉCRAN 3 : SUPERVISION CABINET (RADAR PRÉVENTION & PORTEFEUILLE DES 10 DOSSIERS)
+# ==============================================================================
+with tab_avocat_radar:
+    st.subheader("📡 Supervision du Cabinet — Veille Proactive & Registre des Dossiers")
+    st.caption("Vue globale de l'activité du cabinet : surveillance automatisée des abonnés Prévention (P1, P2, P3) et répartition du travail entre l'IA locale et les avocats.")
     
-    # Timeline des 5 étapes de la Slide 16
-    st.markdown("#### 1. Avancement du dossier en 5 étapes (Slide 16)")
-    cols_step = st.columns(5)
-    etapes = [
-        ("01 Détection", "IA Prestataire", "✅ Terminé (URL & miroirs repérés)"),
-        ("02 Qualification", "IA Locale Cabinet", "✅ Terminé (Preuve SHA-256 & Actes prêts)"),
-        ("03 Validation", "Avocat 24h/24", "✅ Validé" if st.session_state.avocat_valide else "⏳ En attente validation Écran 2"),
-        ("04 Action", "Avocat 24h/24", "🚀 Notification envoyée" if st.session_state.avocat_valide else "⏳ Prêt pour envoi"),
-        ("05 Suivi & Veille", "Client & IA", "🛡️ Veille 7 jours active (0 republication)")
-    ]
-    for idx, (nom_e, acteur_e, statut_e) in enumerate(etapes):
-        with cols_step[idx]:
-            st.markdown(f"""
-            <div class="kpi-box">
-                <span class="step-badge">{acteur_e}</span>
-                <h5 style="margin:8px 0 4px 0;">{nom_e}</h5>
-                <p style="margin:0; font-size:0.85em;">{statut_e}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Dossiers traités en test", "10 dossiers", "100 % qualifiés")
+    m2.metric("Gain de temps par dossier", "14 sec (IA)", "vs 2h30 de préparation manuelle")
+    m3.metric("Données exposées hors cabinet", "0 octet", "IA locale + n8n auto-hébergé")
+    m4.metric("Validation humaine avocat", "100 %", "Permanence 24h/24 & 7j/7")
+    
     st.divider()
-    col_suivi, col_tarif = st.columns([1.1, 1])
+    st.markdown("#### 📋 Registre des 10 dossiers types : Ce que l'IA traite vs Ce que l'Avocat décide")
+    st.write("Cliquez sur le bouton à droite d'un dossier pour le charger directement dans le **Poste Avocat (Écran 2)** et l'**Espace Client (Écran 1)**.")
     
-    with col_suivi:
-        st.markdown("#### 2. Radar de Veille Anti-Republication (1 semaine incluse dès R1 - Slide 13 & 20)")
-        df_mirrors = pd.DataFrame([
-            {"Date de scan": "Aujourd'hui - 10h15", "Plateforme": "URL Principale signalée", "Statut": "Notification DSA transmise", "Action Replik": "Suivi du retrait en cours"},
-            {"Date de scan": "Aujourd'hui - 10h20", "Plateforme": "Google Search / Cache", "Statut": "Aucune indexation miroir", "Action Replik": "Surveillance horaire active"},
-            {"Date de scan": "Aujourd'hui - 10h25", "Plateforme": "X / TikTok / Telegram", "Statut": "0 republication détectée", "Action Replik": "Empreinte hash sous veille 7j"}
-        ])
-        st.dataframe(df_mirrors, use_container_width=True, hide_index=True)
-        
-    with col_tarif:
-        st.markdown("#### 3. Simulateur de Forfait Transparent (0 € de frais cachés - Slides 20 à 22)")
-        famille = st.selectbox("Choisir la famille de formule :", [
-            "⚡ Famille RÉACTION (R1 à R4)",
-            "🔔 Famille PRÉVENTION (Abonnements P1, P2, P3)",
-            "⚖️ Famille JUSTICE (Civile J1 & Pénale J2A, J2B, J2C)"
-        ])
-        
-        if "RÉACTION" in famille:
-            f_r = st.selectbox("Palier Réaction :", [
-                "R1 Essentiel — 125 € HT",
-                "R2 Preuve horodatée — 150 € HT",
-                "R3 Preuve authentique (Commissaire 24/7 inclus) — 320 € HT",
-                "R4 Retrait judiciaire (Mise en demeure + Référé) — 1 700 à 2 650 € HT"
-            ])
-            opt_nuit = st.checkbox("Intervention de nuit, week-end ou jour férié (+75 € HT sur R1/R2, +150 € HT sur R3)")
-            prix_base = 125 if "R1" in f_r else (150 if "R2" in f_r else (320 if "R3" in f_r else 1700))
-            maj = (75 if ("R1" in f_r or "R2" in f_r) else (150 if "R3" in f_r else 0)) if opt_nuit else 0
-            st.metric("Total Forfait HT (Frais de tiers inclus)", f"{prix_base + maj} € HT", "Contre 300 à 450 €/h en cabinet classique")
-            
-        elif "PRÉVENTION" in famille:
-            f_p = st.selectbox("Profil & Niveau d'abonnement :", [
-                "P1 Particulier — Niv. 1 Veille (29 € HT/mois) | 2 signalements inclus",
-                "P1 Particulier — Niv. 2 Preuve (39 € HT/mois) | 6 signalements + captures R2 incluses",
-                "P1 Particulier — Niv. 3 Justice (59 € HT/mois) | 12 signalements + 2 constats R3/an + -25% référé",
-                "P2 Personnalité — Niv. 1 Veille (249 € HT/mois) | 15 signalements inclus",
-                "P2 Personnalité — Niv. 2 Preuve (349 € HT/mois) | 15 signalements + captures R2 + -15% référé",
-                "P2 Personnalité — Niv. 3 Justice (449 € HT/mois) | 25 signalements + 2 constats R3/an + -25% référé",
-                "P3 Entreprise — Niv. 1 Veille (229 € HT/mois) | 15 signalements + rapport mensuel",
-                "P3 Entreprise — Niv. 2 Preuve (299 € HT/mois) | 15 signalements + captures R2 + -15% référé",
-                "P3 Entreprise — Niv. 3 Justice (369 € HT/mois) | 25 signalements + 2 constats R3/an + -25% référé"
-            ])
-            pack_proches = st.checkbox("Ajouter l'Option Pack Proches sur P2 (+39 € HT/mois)")
-            eng_annuel = st.checkbox("Engagement annuel (12 mois payés 10)")
-            st.info("✅ Sans engagement par défaut. Frais d'IA et de plateforme 100 % inclus.")
-            
-        else:
-            f_j = st.selectbox("Formule Justice :", [
-                "J1 Justice civile (Dommages-intérêts sans plainte pénale) — 2 800 à 5 150 € HT",
-                "J2A Citation directe (Auteur identifié, constat R3 inclus) — 2 700 à 4 200 € HT",
-                "J2B Plainte au procureur (Auteur inconnu, constat R3 inclus) — 700 à 1 000 € HT",
-                "J2C Partie civile directe (Saisine juge d'instruction, suivi 12 mois) — 3 800 à 7 200 € HT"
-            ])
-            st.caption("Note transparente (Slide 22) : Le constat R3 est inclus dans J2. Non inclus : consignation fixée par le juge, frais adverses et identification hors UE sur devis.")
-
-# ------------------------------------------------------------------------------
-# ONGLET 4 : BANC DE TEST DES 10 FAUX SIGNALEMENTS & WORKFLOW n8n (SLIDE 18)
-# ------------------------------------------------------------------------------
-with tab_labo:
-    st.subheader("🧪 Banc d'Essai Bêta : Les 10 Faux Signalements & Architecture n8n Locale (Slide 18)")
-    st.markdown("""
-    Cet écran matérialise directement la **Slide 18 (Prototype : Du croquis à la version bêta)** :
-    1. **Automatisation avec `n8n` installable en local** (cohérent avec l'IA locale du cabinet : 0 fuite de données).
-    2. **Test sur 10 faux signalements** mesurant précisément **ce que l'IA traite** vs **ce qu'elle renvoie à l'avocat**.
-    """)
-    
-    col_k1, col_k2, col_k3, col_k4 = st.columns(4)
-    col_k1.metric("Signalements testés", "10 / 10", "100 % pré-qualifiés")
-    col_k2.metric("Temps de préparation IA", "14 sec", "Au lieu de 2h30 avocat")
-    col_k3.metric("Détection piège prescription", "100 %", "Cas n°9 bloqué avec succès")
-    col_k4.metric("Données envoyées hors cabinet", "0 octet", "IA locale + n8n auto-hébergé")
-    
-    st.markdown("#### 📋 Tableau de mesure des 10 faux signalements (Ce que l'IA traite vs Ce qu'elle renvoie à l'avocat)")
-    df_10 = pd.DataFrame([
-        {
-            "Réf": x["id"],
-            "Scénario testé": x["titre"],
-            "Délai pub.": f"{x['jours_depuis_pub']} j.",
-            "Ce que l'IA locale traite seule (Automatisation)": x["ia_traite_auto"],
-            "Ce que l'IA renvoie à l'Avocat (Plus-value & RCP)": x["renvoi_avocat"],
-            "Formule Replik": x["recommandation_r"]
-        }
-        for x in DIX_SIGNALEMENTS
-    ])
-    st.dataframe(df_10, use_container_width=True, hide_index=True)
-    
-    with st.expander("⚙️ Voir l'architecture du workflow n8n local (Slide 18)"):
-        st.code("""
-[Webhook Formulaire / Alerte Veille Prestataire]
-       │
-       ▼
-[Nœud n8n 1 : Capture Serveur & Hash SHA-256 Local] ──► Envoi immédiat de l'Accusé Horodaté au Client
-       │
-       ▼
-[Nœud n8n 2 : Calculateur Prescription Loi 1881 (90 jours)]
-       ├── Si > 90 jours ──► Alerte Rouge "Prescription 1881 acquise -> Bascule Art. 1240 C. civ."
-       └── Si <= 90 jours ─► Compteur d'urgence activé
-       │
-       ▼
-[Nœud n8n 3 : LLM Local (Ollama / Mistral sur serveur français du cabinet)]
-       │   Prompt système : Qualification pénale/presse + Pré-remplissage des modèles d'actes
-       ▼
-[Nœud n8n 4 : Notification Avocat de Permanence 24/7] ──► Validation humaine obligatoire avant expédition
-        """, language="text")
+    for d in DOSSIERS_TYPES:
+        with st.expander(f"📁 {d['id']} — {d['label']} | Client : {d['client']} ({d['profil']})"):
+            c_info, c_btn = st.columns([4, 1])
+            with c_info:
+                st.markdown(f"- **Faits signalés :** {d['faits']}")
+                st.markdown(f"- 🤖 **Ce que l'IA locale automatise :** {d['ia_actions']}")
+                st.markdown(f"- ⚖️ **Ce que l'Avocat contrôle et tranche :** {d['avocat_arbitrage']}")
+                st.markdown(f"- 💶 **Formule Réaction :** `{d['formule']}` | **Suite Justice :** `{d['suite_justice']}`")
+            with c_btn:
+                if st.button("Charger ce dossier", key=f"btn_{d['id']}", use_container_width=True):
+                    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%d/%m/%Y à %H:%M:%S UTC")
+                    raw = f"{d['id']}|{d['client']}|{d['url']}|{now_utc}"
+                    st.session_state.active_case = {
+                        **d,
+                        "timestamp": now_utc,
+                        "sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                        "statut_avocat": "EN ATTENTE DE VALIDATION AVOCAT",
+                        "acte_valide": False,
+                        "avocat_signataire": "Me. Associé de Permanence (Barreau de Paris)",
+                        "acte_final": ""
+                    }
+                    st.toast(f"Dossier {d['id']} chargé dans l'application !", icon="✅")
